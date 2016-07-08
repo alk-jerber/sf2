@@ -1,0 +1,103 @@
+<html>
+  <head>
+    <link rel='stylesheet' href='styles.css' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
+  </head>
+  <body>
+    <div id="background">
+      <h1 class='score'>High scores</h1>
+      <div id="scores">
+      </div>
+    </div>
+    <script>
+      var defaultName = name = 'JF Dean';
+      var positions = ['1st', '2nd', '3rd'];
+      var newScores = [30, 40, 50];
+      var scores = [
+        { name: 'jester', score: 545320 },
+        { name: 'wizard', score: 341240 },
+        { name: 'traffy', score: 336580 },
+        { name: 'tombstone', score: 285255 },
+        { name: 'joker', score: 272320 },
+        { name: 'birdy', score: 265080 },
+        { name: 'koj', score: 223430 },
+        { name: 'voodoo3', score: 185000 },
+        { name: 'stinger', score: 125435 }
+      ];
+
+      var getScore = function () {
+        var key = 'score';
+        var search = window.location.search;
+        if (!search) return 50;
+        search = search.split("&")
+        for(i = 0; i < search.length; i++){
+          qs = search[i];
+          // Score never more than 50 chars
+          if(qs.length <= '?score=50'.length) {
+            // Check the score is a valid one
+            if(newScores.indexOf(key)) {
+              return qs.substr(qs.indexOf(key) + key.length + 1);
+            }
+          }
+        }
+        return 50;
+      };
+
+      var score = getScore();
+      console.log(score);
+      if (!newScores[score]) {
+        score = 50;
+      }
+      if (window.location.hash) {
+        hashes = window.location.hash.split('|');
+        for (var i = 0; i < hashes.length; i++) {
+          parts = hashes[i].split('=');
+          name = decodeURIComponent(parts[0]);
+          value = decodeURIComponent(parts[1]);
+          if (name == 'validScore') {
+            score = value;
+            newScores.push(score);
+          }
+        }
+      }
+
+      var HighScores = {
+        name: defaultName,
+        score: 30,
+        render: function () {
+          if (this.score < scores[scores.length - 1].score) {
+            scores.push({ name: this.name, score: this.score });
+          } else {
+            if (isNaN(this.score)) {
+              this.score = 50;
+            }
+            scores.unshift({ name: this.name, score: this.score });
+          }
+          for (var i = 0; i < scores.length; i++) {
+            var line = document.createElement('div');
+            line.className = 'line';
+
+            var positionDiv = document.createElement('div');
+            positionDiv.className = 'position score';
+            positionDiv.textContent = positions[i] ? positions[i] : (i+1) + 'th';
+
+            var nameDiv = document.createElement('div');
+            nameDiv.className = 'name score';
+            nameDiv.textContent = scores[i].name;
+
+            var scoreDiv = document.createElement('div');
+            scoreDiv.className = 'score';
+            scoreDiv.textContent = scores[i].score;
+
+            line.appendChild(positionDiv);
+            line.appendChild(scoreDiv);
+            line.appendChild(nameDiv);
+            document.getElementById('scores').appendChild(line);
+          }
+        }
+      }
+
+      window.setTimeout(HighScores.render, 100);
+    </script>
+  </body>
+</html>
